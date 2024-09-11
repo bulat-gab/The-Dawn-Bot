@@ -1,3 +1,12 @@
+do_not_commit*
+.deploy
+
+database.sqlite3*
+
+results/**
+
+.vscode
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 .idea/

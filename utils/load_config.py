@@ -1,12 +1,11 @@
 import os
 import yaml
-from itertools import cycle
 from loguru import logger
 from models import Config, Account
 from better_proxy import Proxy
 from typing import List, Dict, Generator
 
-CONFIG_PATH = os.path.join(os.getcwd(), "config")
+CONFIG_PATH = os.path.join(os.getcwd(), "do_not_commit.config")
 CONFIG_DATA_PATH = os.path.join(CONFIG_PATH, "data")
 CONFIG_PARAMS = os.path.join(CONFIG_PATH, "settings.yaml")
 
@@ -59,49 +58,65 @@ def get_proxies() -> List[Proxy]:
         raise ValueError(f"Failed to parse proxy: {exc}")
 
 
-def get_accounts(file_name: str, redirect_mode: bool = False) -> Generator[Account, None, None]:
-    try:
-        proxies = get_proxies()
-        proxy_cycle = cycle(proxies) if proxies else None
-        accounts = read_file(os.path.join(CONFIG_DATA_PATH, file_name), check_empty=False)
+# def get_accounts(file_name: str, redirect_mode: bool = False) -> Generator[Account, None, None]:
+#     try:
+#         proxies = get_proxies()
+#         proxy_cycle = cycle(proxies) if proxies else None
+#         accounts = read_file(os.path.join(CONFIG_DATA_PATH, file_name), check_empty=False)
 
-        for account in accounts:
-            try:
-                if not account.strip():
-                    continue
+#         for account in accounts:
+#             try:
+#                 if not account.strip():
+#                     continue
 
-                if redirect_mode:
-                    splits = account.split(":", 1)
-                    if len(splits) == 2:
-                        email, password = splits
-                        yield Account(
-                            email=email.strip(),
-                            password=password.strip(),
-                            proxy=next(proxy_cycle) if proxy_cycle else None
-                        )
-                    else:
-                        yield Account(
-                            email=account.strip(),
-                            proxy=next(proxy_cycle) if proxy_cycle else None
-                        )
-                else:
-                    splits = account.split(":", 1)
-                    if len(splits) != 2:
-                        raise ValueError(f"Invalid account format: {account}")
+#                 if redirect_mode:
+#                     splits = account.split(":", 1)
+#                     if len(splits) == 2:
+#                         email, password = splits
+#                         yield Account(
+#                             email=email.strip(),
+#                             password=password.strip(),
+#                             proxy=next(proxy_cycle) if proxy_cycle else None
+#                         )
+#                     else:
+#                         yield Account(
+#                             email=account.strip(),
+#                             proxy=next(proxy_cycle) if proxy_cycle else None
+#                         )
+#                 else:
+#                     splits = account.split(":", 1)
+#                     if len(splits) != 2:
+#                         raise ValueError(f"Invalid account format: {account}")
 
-                    email, password = splits
-                    yield Account(
-                        email=email.strip(),
-                        password=password.strip(),
-                        proxy=next(proxy_cycle) if proxy_cycle else None
-                    )
+#                     email, password = splits
+#                     yield Account(
+#                         email=email.strip(),
+#                         password=password.strip(),
+#                         proxy=next(proxy_cycle) if proxy_cycle else None
+#                     )
 
-            except Exception as e:
-                if not redirect_mode:
-                    raise ValueError(f"Failed to parse account: {account}. Error: {str(e)}")
+#             except Exception as e:
+#                 if not redirect_mode:
+#                     raise ValueError(f"Failed to parse account: {account}. Error: {str(e)}")
 
-    except Exception as e:
-        raise ValueError(f"Failed to process accounts file: {str(e)}")
+#     except Exception as e:
+#         raise ValueError(f"Failed to process accounts file: {str(e)}")
+
+def get_accounts(file_name: str) -> Generator[Account, None, None]:
+    accounts = read_file(os.path.join(CONFIG_DATA_PATH, file_name), check_empty=False)
+
+    for account in accounts:
+        try:
+            left_part, right_part = account.split(' 🚀 ')
+
+            email, password = left_part.split(":")
+            yield Account(
+                email=email,
+                password=password,
+                proxy=Proxy.from_str(right_part),
+            )
+        except ValueError as e:
+            logger.error(f"Failed to parse account: {account}. Error: {e}")
 
 
 def validate_domains(accounts: List[Account], domains: Dict[str, str]) -> List[Account]:
