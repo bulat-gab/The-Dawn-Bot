@@ -6,7 +6,7 @@ from loguru import logger
 from models import Config, Account
 from better_proxy import Proxy
 
-CONFIG_PATH = os.path.join(os.getcwd(), "config")
+CONFIG_PATH = os.path.join(os.getcwd(), "do_not_commit.config")
 CONFIG_DATA_PATH = os.path.join(CONFIG_PATH, "data")
 CONFIG_PARAMS = os.path.join(CONFIG_PATH, "settings.yaml")
 
