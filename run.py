@@ -92,6 +92,13 @@ async def run() -> None:
     }
 
     while True:
+        argv = sys.argv
+        if len(argv) > 1:
+            if argv[1] == "farm":
+                config.module = "farm"
+                accounts, process_func = module_map[config.module]
+                await process_func(accounts)
+
         Console().build()
 
         if config.module not in module_map:
