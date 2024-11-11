@@ -4,7 +4,7 @@ module.exports = {
   apps: [
     {
       name: "dawn_bot",
-      script: "main.py",
+      script: "run.py",
       interpreter: isWindows ? "venv\\Scripts\\pythonw.exe" : "venv/bin/python",
       ignore_watch: ["deploy", "\\.git", "*.log"],
       args: "farm",
