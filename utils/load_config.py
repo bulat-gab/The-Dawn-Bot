@@ -1,6 +1,5 @@
 import os
 import yaml
-from itertools import cycle
 from loguru import logger
 from models import Config, Account
 from better_proxy import Proxy
@@ -45,32 +44,21 @@ def get_params() -> Dict:
         raise ValueError(f"Missing fields in config file: {', '.join(missing_fields)}")
     return data
 
-
-def get_proxies() -> List[Proxy]:
-    try:
-        proxies = read_file(
-            os.path.join(CONFIG_DATA_PATH, "proxies.txt"), check_empty=False
-        )
-        return [Proxy.from_str(line) for line in proxies] if proxies else []
-    except Exception as exc:
-        raise ValueError(f"Failed to parse proxy: {exc}")
-
-
 def get_accounts(file_name: str) -> Generator[Account, None, None]:
-    proxies = get_proxies()
-    proxy_cycle = cycle(proxies) if proxies else None
     accounts = read_file(os.path.join(CONFIG_DATA_PATH, file_name), check_empty=False)
 
     for account in accounts:
         try:
-            email, password = account.split(":")
+            left_part, right_part = account.split(' 🚀 ')
+
+            email, password = left_part.split(":")
             yield Account(
                 email=email,
                 password=password,
-                proxy=next(proxy_cycle) if proxy_cycle else None,
+                proxy=Proxy.from_str(right_part),
             )
-        except ValueError:
-            logger.error(f"Failed to parse account: {account}")
+        except ValueError as e:
+            logger.error(f"Failed to parse account: {account}. Error: {e}")
 
 
 def validate_domains(accounts: List[Account], domains: Dict[str, str]) -> List[Account]:
