@@ -1,4 +1,5 @@
 do_not_commit*
+.deploy
 
 database.sqlite3*
 
