@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from typing import Tuple, Any, Optional
 
 import pytz
-from loguru import logger
 from loader import config, file_operations
 from models import Account, OperationResult, StatisticData
 
@@ -11,6 +10,7 @@ from utils import check_email_for_link, check_if_email_valid
 from database import Accounts
 from .exceptions.base import APIError, SessionRateLimited, CaptchaSolvingFailed
 
+from utils.loguru_logger import logger
 
 class Bot(DawnExtensionAPI):
     def __init__(self, account: Account):
