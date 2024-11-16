@@ -420,9 +420,9 @@ class Bot(DawnExtensionAPI):
 
         if sleep_until > current_time:
             sleep_duration = (sleep_until - current_time).total_seconds()
-            logger.debug(
-                f"Account: {self.account_data.email} | Sleeping until {sleep_until} (duration: {sleep_duration:.2f} seconds)"
-            )
+            # logger.debug(
+            #     f"Account: {self.account_data.email} | Sleeping until {sleep_until} (duration: {sleep_duration:.2f} seconds)"
+            # )
             return True
 
         return False
