@@ -68,6 +68,7 @@ class Bot(DawnExtensionAPI):
                 imap_server=self.account_data.imap_server,
                 email=self.account_data.email,
                 password=self.account_data.password,
+                proxy=self.account_data.proxy
             )
 
             if confirm_url is None:
@@ -118,6 +119,7 @@ class Bot(DawnExtensionAPI):
                 self.account_data.imap_server,
                 self.account_data.email,
                 self.account_data.password,
+                proxy=self.account_data.proxy
             ):
                 logger.error(f"Account: {self.account_data.email} | Invalid email")
                 return OperationResult(
@@ -138,6 +140,7 @@ class Bot(DawnExtensionAPI):
                 imap_server=self.account_data.imap_server,
                 email=self.account_data.email,
                 password=self.account_data.password,
+                proxy=self.account_data.proxy
             )
 
             if confirm_url is None:

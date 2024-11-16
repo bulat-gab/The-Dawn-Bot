@@ -1,20 +1,28 @@
+import imaplib
+from better_proxy import Proxy
+import socks
+import socket
+
+
 import re
 from typing import Optional
 import asyncio
 
+
 from loguru import logger
-from imap_tools import MailBox, AND
+from .mailbox_proxy import MailBoxProxy as MailBox
 
 
 async def check_if_email_valid(
     imap_server: str,
     email: str,
     password: str,
+    proxy: Proxy = None,
 ) -> bool:
-    logger.info(f"Account: {email} | Checking if email is valid...")
+    logger.info(f"Account: {email}, proxy: {proxy} | Checking if email is valid...")
 
     try:
-        await asyncio.to_thread(lambda: MailBox(imap_server).login(email, password))
+        await asyncio.to_thread(lambda: MailBox(proxy, imap_server).login(email, password))
         return True
     except Exception as error:
         logger.error(f"Account: {email} | Email is invalid (IMAP): {error}")
@@ -27,18 +35,19 @@ async def check_email_for_link(
     password: str,
     max_attempts: int = 8,
     delay_seconds: int = 5,
+    proxy: Proxy = None
 ) -> Optional[str]:
     link_pattern = (
         r"https://www\.aeropres\.in/chromeapi/dawn/v1/user/verifylink\?key=[a-f0-9-]+"
     )
-    logger.info(f"Account: {email} | Checking email for link...")
+    logger.info(f"Account: {email}, proxy: {proxy} | Checking email for link...")
 
     try:
 
         async def search_in_mailbox():
             return await asyncio.to_thread(
                 lambda: search_for_link_sync(
-                    MailBox(imap_server).login(email, password), link_pattern
+                    MailBox(proxy, imap_server).login(email, password), link_pattern
                 )
             )
 
@@ -63,7 +72,7 @@ async def check_email_for_link(
             async def search_in_spam():
                 return await asyncio.to_thread(
                     lambda: search_for_link_in_spam_sync(
-                        MailBox(imap_server).login(email, password),
+                        MailBox(proxy, imap_server).login(email, password),
                         link_pattern,
                         spam_folder,
                     )
