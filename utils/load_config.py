@@ -134,7 +134,8 @@ def load_config() -> Config:
     try:
         params = get_params()
 
-        reg_accounts = list(get_accounts("register.txt", redirect_mode=params["redirect_settings"]["enabled"]))
+        # reg_accounts = list(get_accounts("register.txt", redirect_mode=params["redirect_settings"]["enabled"]))
+        reg_accounts = list(get_accounts("register.txt"))
         farm_accounts = list(get_accounts("farm.txt"))
         reverify_accounts = list(get_accounts("reverify.txt"))
 
