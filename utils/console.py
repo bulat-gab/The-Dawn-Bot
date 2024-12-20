@@ -1,7 +1,7 @@
 import sys
 import urllib3
 
-from utils.loguru_logger import logger
+from loguru import logger
 
 
 def setup():
