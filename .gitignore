@@ -1,5 +1,6 @@
 do_not_commit*
 .deploy
+service_account.json
 
 database.sqlite3*
 
