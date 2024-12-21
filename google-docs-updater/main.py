@@ -98,6 +98,7 @@ def _find_total_points(log_line:str):
     
 def _write_stats_to_file(data: dict[str, float]):
     file_name = get_file_name_with_date()
+    logger.info(f"Writing stats to file {file_name}")
 
     existing_data = load_stats(file_name)
     for email, new_points in data.items():
@@ -151,6 +152,7 @@ def update_stats():
 
 def run():
     while True:
+        logger.info("Start google docs updater.")
         date = datetime.datetime.now()
 
         today_result = get_file_name_with_date(date)
