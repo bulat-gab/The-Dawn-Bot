@@ -124,7 +124,7 @@ def _get_stats_from_server() -> dict[str, float]:
     return sorted_mapping
 
 def update_stats():
-    gse = GoogleSheetsEditor(SHEET_URL)
+    gse = GoogleSheetsEditor(SHEET_URL, './google-docs-updater/service_account.json')
     wh = gse.worksheet('Dawn')
 
     email_col_index = gse.find_col_index('Email')
