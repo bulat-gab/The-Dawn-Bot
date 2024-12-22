@@ -17,7 +17,6 @@ logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 LOG_FILE_PATH = '/root/DawnBot/logs/logs.log'
-PROJECT_DIR = '/root/DawnBot/google-docs-updater'
 RESULT_DIR = '/root/DawnBot/google-docs-updater/result'
 DATETIME_FORMAT = '%Y-%m-%d'
 
@@ -125,7 +124,7 @@ def _get_stats_from_server() -> dict[str, float]:
     return sorted_mapping
 
 def update_stats():
-    gse = GoogleSheetsEditor(SHEET_URL, f'{PROJECT_DIR}/service_account.json')
+    gse = GoogleSheetsEditor(SHEET_URL, './google-docs-updater/service_account.json')
     wh = gse.worksheet('Dawn')
 
     email_col_index = gse.find_col_index('Email')
