@@ -11,7 +11,8 @@ module.exports = {
     },
     {
       name: "google-docs-updater_dawn",
-      script: "google-docs-updater/main.py",
+      cwd: "./google-docs-updater",
+      script: "main.py",
       interpreter: isWindows ? "venv\\Scripts\\pythonw.exe" : "venv/bin/python",
       ignore_watch: ["deploy", "\\.git", "*.log"],
     },
