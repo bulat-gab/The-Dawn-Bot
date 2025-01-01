@@ -3,20 +3,33 @@ import datetime
 import os
 import re
 import csv
+import sys
 import time
-import logging
 
 from dotenv import load_dotenv
 
 from google_sheets import GoogleSheetsEditor
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+from loguru import logger
+
+
+
+level = "INFO"
+
+logger.remove()
+logger.add(
+    sys.stdout,
+    level=level,
+    colorize=True,
+    format="<light-cyan>{time:HH:mm:ss}</light-cyan> | <level> {level: <8}</level> | - <white>{"
+    "message}</white>",
+)
+logger.add("./google-docs-updater.log", rotation="1 day", retention="7 days")
 
 load_dotenv()
 
 LOG_FILE_PATH = '/root/DawnBot/logs/logs.log'
-RESULT_DIR = '/root/DawnBot/google-docs-updater/result'
+RESULT_DIR = os.getenv('RESULT_DIR', '/root/DawnBot/google-docs-updater/result')
 DATETIME_FORMAT = '%Y-%m-%d'
 
 SHEET_URL = os.getenv("SHEET_URL")
@@ -112,6 +125,7 @@ def _write_stats_to_file(data: dict[str, float]):
         writer.writerows(to_write)
 
 def _get_stats_from_server() -> dict[str, float]:
+    logger.info(f"Extracting today's logs.")
     logs = get_last_lines(num_lines=500)
 
     mapping = {}
@@ -123,6 +137,7 @@ def _get_stats_from_server() -> dict[str, float]:
             mapping[email] = round(float(points), 1)
 
     sorted_mapping = dict(sorted(mapping.items()))
+    logger.info(f"Found data for {len(sorted_mapping)} accounts.")
     return sorted_mapping
 
 def update_stats():
@@ -137,6 +152,7 @@ def update_stats():
     today_stats = _get_stats_from_server()
     yesterday_stats = get_yesterday_stats()
 
+    logger.info(f"Updating google docs. {len(today_stats)} accounts.")
     for email, points in today_stats.items():
         email_row = emails_col.index(email) + 1
 
@@ -150,6 +166,7 @@ def update_stats():
         wh.update_cell(email_row, speed_col_index, points_per_day)
         logger.debug(f'Account {email} updated. Points {points}. points_per_day: {points_per_day}')
     
+    logger.info(f"Update successful.")
     _write_stats_to_file(today_stats)
 
 def run():
