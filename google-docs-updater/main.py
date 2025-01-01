@@ -3,7 +3,6 @@ import datetime
 import os
 import re
 import csv
-import sys
 import time
 import logging
 
@@ -21,23 +20,26 @@ RESULT_DIR = '/root/DawnBot/google-docs-updater/result'
 DATETIME_FORMAT = '%Y-%m-%d'
 
 SHEET_URL = os.getenv("SHEET_URL")
-
+ENV = os.getenv('ENVIRONMENT')
+CREDENTIALS_FILE = os.getenv('CREDENTIALS_FILE', 'service_account.json')
 
 def get_last_lines(file_path=LOG_FILE_PATH, num_lines=100) -> list[str]:
-    result = subprocess.run(
-        ['tail', f'-n{num_lines}', file_path],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
-    if result.returncode != 0:
-        raise RuntimeError(f"Error reading file: {result.stderr.strip()}")
-    return result.stdout.splitlines()
-
     # For debug
-    # with open("../logs/logs.log", 'r') as f:
-    #     return f.readlines()
+    if ENV == 'dev':
+        with open("../logs/logs.log", 'r') as f:
+            return f.readlines()
+    else:
+        result = subprocess.run(
+            ['tail', f'-n{num_lines}', file_path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"Error reading file: {result.stderr.strip()}")
+        return result.stdout.splitlines()
 
+ 
 def get_file_name_with_date(date: datetime = None, path: str = RESULT_DIR) -> str:
     if not os.path.exists(path):
         os.makedirs(path)
@@ -124,7 +126,7 @@ def _get_stats_from_server() -> dict[str, float]:
     return sorted_mapping
 
 def update_stats():
-    gse = GoogleSheetsEditor(SHEET_URL, './google-docs-updater/service_account.json')
+    gse = GoogleSheetsEditor(SHEET_URL, CREDENTIALS_FILE)
     wh = gse.worksheet('Dawn')
 
     email_col_index = gse.find_col_index('Email')
